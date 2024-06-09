@@ -4,10 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel='stylesheet' href='/static/css/main.css'>
+  <link rel='shortcut icon' href='/static/img/favicon.ico' type='image/x-icon'>
+<!-- Also link to some fonts hosted by Google -->
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700'>
   <title>{{template "title" .}} - Snippetbox</title>
-  <link rel="stylesheet" href="/static/css/main.css">
-  <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700">
 </head>
 <body>
   <header>
@@ -19,8 +20,8 @@
   </main>
   <footer>
     Powered by <a href="https://golang.org/">Go</a>
-    <script src="/static/js/main.js" type="text/javascript"></script>
   </footer>
+  <script src="/static/js/main.js" type="text/javascript"></script>
 </body>
 </html>
 {{end}}
