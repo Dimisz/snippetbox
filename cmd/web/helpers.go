@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -14,12 +15,18 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 		return
 	}
 
-	w.WriteHeader(status)
-
-	err := ts.ExecuteTemplate(w, "base", data)
+	// initialize a new buffer
+	// write res to buffer first instead of ResponseWriter
+	// if no err -> proceed
+	buf := new(bytes.Buffer)
+	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
+
+	w.WriteHeader(status)
+	buf.WriteTo(w)
 }
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
