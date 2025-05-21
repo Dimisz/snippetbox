@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/dimisz/snippetbox/internal/models"
 	"github.com/dimisz/snippetbox/internal/validator"
