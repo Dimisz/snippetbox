@@ -66,41 +66,21 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "create.html", data)
 }
 
+// include struct tags to tell the formDecoder
+// how to map form fields to struct
 type snippetCreateForm struct {
-	Title   string
-	Content string
-	Expires int
-	validator.Validator
+	Title               string `form:"title"`
+	Content             string `form:"content"`
+	Expires             int    `form:"expires"`
+	validator.Validator `form:"-"`
 }
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	// method checked automatically by httprouter
-	// if r.Method != http.MethodPost {
-	// 	w.Header().Set("Allow", http.MethodPost)
-	// 	app.clientError(w, http.StatusMethodNotAllowed)
-	// 	return
-	// }
-
-	// call r.ParseForm() to add any data in POST request body
-	// to r.PostForm map
-	err := r.ParseForm()
+	var form snippetCreateForm
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
-	}
-
-	// title := r.PostForm.Get("title")
-	// content := r.PostForm.Get("content")
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	form := snippetCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: expires,
 	}
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
