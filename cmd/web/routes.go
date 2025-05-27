@@ -18,10 +18,14 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	router.HandlerFunc(http.MethodGet, "/", app.home)
-	router.HandlerFunc(http.MethodGet, "/snippet/view/:id", app.snippetView)
-	router.HandlerFunc(http.MethodGet, "/snippet/create", app.snippetCreate)
-	router.HandlerFunc(http.MethodPost, "/snippet/create", app.snippetCreatePost)
+	// create a new middleware chain containing middleware
+	// specific to dynamic routes
+	dynamicRoutesMiddleware := alice.New(app.sessionManager.LoadAndSave)
+
+	router.Handler(http.MethodGet, "/", dynamicRoutesMiddleware.ThenFunc(app.home))
+	router.Handler(http.MethodGet, "/snippet/view/:id", dynamicRoutesMiddleware.ThenFunc(app.snippetView))
+	router.Handler(http.MethodGet, "/snippet/create", dynamicRoutesMiddleware.ThenFunc(app.snippetCreate))
+	router.Handler(http.MethodPost, "/snippet/create", dynamicRoutesMiddleware.ThenFunc(app.snippetCreatePost))
 
 	// create a middleware chain using 3rd party package
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
