@@ -17,7 +17,7 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	dynamicMiddlewareChain := alice.New(app.sessionManager.LoadAndSave)
+	dynamicMiddlewareChain := alice.New(app.sessionManager.LoadAndSave, noSurf)
 
 	// auth not required
 	router.Handler(http.MethodGet, "/", dynamicMiddlewareChain.ThenFunc(app.home))
