@@ -19,16 +19,20 @@ func (app *application) routes() http.Handler {
 
 	dynamicMiddlewareChain := alice.New(app.sessionManager.LoadAndSave)
 
+	// auth not required
 	router.Handler(http.MethodGet, "/", dynamicMiddlewareChain.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/snippet/view/:id", dynamicMiddlewareChain.ThenFunc(app.snippetView))
-	router.Handler(http.MethodGet, "/snippet/create", dynamicMiddlewareChain.ThenFunc(app.snippetCreate))
-	router.Handler(http.MethodPost, "/snippet/create", dynamicMiddlewareChain.ThenFunc(app.snippetCreatePost))
-
 	router.Handler(http.MethodGet, "/user/signup", dynamicMiddlewareChain.ThenFunc(app.userSignup))
 	router.Handler(http.MethodPost, "/user/signup", dynamicMiddlewareChain.ThenFunc(app.userSignupPost))
 	router.Handler(http.MethodGet, "/user/login", dynamicMiddlewareChain.ThenFunc(app.userLogin))
 	router.Handler(http.MethodPost, "/user/login", dynamicMiddlewareChain.ThenFunc(app.userLoginPost))
-	router.Handler(http.MethodPost, "/user/logout", dynamicMiddlewareChain.ThenFunc(app.userLogoutPost))
+
+	// auth required
+	protected := dynamicMiddlewareChain.Append(app.requireAuthentication)
+
+	router.Handler(http.MethodGet, "/snippet/create", protected.ThenFunc(app.snippetCreate))
+	router.Handler(http.MethodPost, "/snippet/create", protected.ThenFunc(app.snippetCreatePost))
+	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))
 
 	standardMiddlewareChain := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	return standardMiddlewareChain.Then(router)
