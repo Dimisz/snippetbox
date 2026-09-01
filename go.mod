@@ -1,3 +1,3 @@
-module github.com/Dimisz/snippetbox
+module snippetbox
 
 go 1.25.5
