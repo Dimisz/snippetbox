@@ -10,16 +10,16 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Server", "Go")
+
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
-	data := app.newTemplateData(r)
-	data.Snippets = snippets
-
-	app.render(w, r, http.StatusOK, "home.html", data)
+	app.render(w, r, http.StatusOK, "home.html", templateData{
+		Snippets: snippets,
+	})
 }
 
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,6 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
 	snippet, err := app.snippets.Get(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
@@ -39,9 +38,9 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
-	data.Snippet = snippet
-	app.render(w, r, http.StatusOK, "view.html", data)
+	app.render(w, r, http.StatusOK, "view.html", templateData{
+		Snippet: snippet,
+	})
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
@@ -49,9 +48,9 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	title := "1 snail"
-	content := "1 snail\nClimb Mount Jifu,\nBut slowly, slowly!\n\n- Kobayashi Issa"
-	expires := 7
+	title := "100 snail"
+	content := "100 snail or whatever yet again"
+	expires := 100
 
 	id, err := app.snippets.Insert(title, content, expires)
 	if err != nil {

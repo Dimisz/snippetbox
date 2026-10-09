@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	"time"
+	"runtime/debug"
 )
 
+// template renderers
 func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
 	ts, ok := app.templateCache[page]
 	if !ok {
@@ -16,6 +17,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 	}
 
 	buf := new(bytes.Buffer)
+
 	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, r, err)
@@ -26,22 +28,17 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 	buf.WriteTo(w)
 }
 
+// custom error handlers
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
 	var (
 		method = r.Method
 		uri    = r.URL.RequestURI()
+		trace  = string(debug.Stack())
 	)
-
-	app.logger.Error(err.Error(), "method", method, "uri", uri)
+	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
-}
-
-func (app *application) newTemplateData(r *http.Request) templateData {
-	return templateData{
-		CurrentYear: time.Now().Year(),
-	}
 }

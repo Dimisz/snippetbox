@@ -20,13 +20,11 @@ type application struct {
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-
-	dsn := flag.String("dsn", "dbUsername:password@/snippetbox?parseTime=true", "MySQL data source name")
+	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	// establish DB connection
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())
@@ -34,7 +32,6 @@ func main() {
 	}
 	defer db.Close()
 
-	// init template cache
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		logger.Error(err.Error())
@@ -65,5 +62,5 @@ func openDB(dsn string) (*sql.DB, error) {
 		db.Close()
 		return nil, err
 	}
-	return db, err
+	return db, nil
 }
