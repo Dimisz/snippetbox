@@ -9,6 +9,31 @@ import (
 	"strconv"
 )
 
+// userSignup() handler displays a form for signing up a new user
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Display a form for signing up a new user...")
+}
+
+// userSignupPost() handler creates a new user
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Create a new user...")
+}
+
+// userLogin() handler displays a form logging in a user
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Display a form logging in a user...")
+}
+
+// userLoginPost() handler authenticates and logs in the user
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Authenticate and login the user...")
+}
+
+// userLogoutPost() handler logs out the user
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Logout the user...")
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
 	if err != nil {
