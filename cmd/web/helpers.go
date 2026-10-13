@@ -9,7 +9,17 @@ import (
 	"time"
 
 	"github.com/go-playground/form/v4"
+	"github.com/justinas/nosurf"
 )
+
+// isAuthenticated() helper method returns true if the current request is from an authenticated user, otherwise returns false
+func (app *application) isAuthenticated(r *http.Request) bool {
+	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+	return isAuthenticated
+}
 
 // decodePostForm() parses the submitted form and maps the form values to the provided destination type
 func (app *application) decodePostForm(r *http.Request, dst any) error {
@@ -35,8 +45,10 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 // initialized with the current year
 func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.sessionManager.PopString(r.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
 }
 
