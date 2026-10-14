@@ -9,6 +9,14 @@ import (
 	"strconv"
 )
 
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello world!"))
+}
+
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
+}
+
 // userSignupForm struct holds maps the fields of the user signup form
 type userSignupForm struct {
 	Name     string `form:"name"`

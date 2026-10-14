@@ -22,7 +22,11 @@ type templateData struct {
 // humanDate function returns a nicely formatted
 // string representation if a time.Time object
 func humanDate(t time.Time) string {
-	return t.Format("02 Jan 2006 at 15:04")
+	// return empty string if time has zero value
+	if t.IsZero() {
+		return ""
+	}
+	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
 // map the humanDate function to the template engine
